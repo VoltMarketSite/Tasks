@@ -1,0 +1,37 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "backend for project with tasks"
+authors = [
+    {name = "legeorg2004@gmail.com"}
+] 
+readme = "README.md"
+requires-python = ">=3.10,<4.0"
+dependencies = [
+    "bs4 (>=0.0.2,<0.0.3)",
+    "requests (>=2.32.3,<3.0.0)",
+    "patool (>=4.0.0,<5.0.0)",
+    "python-magic (>=0.4.27,<0.5.0)",
+    "python-magic-bin (==0.4.14)",
+    "python-docx (>=1.1.2,<2.0.0)",
+    "pymupdf (>=1.25.5,<2.0.0)",
+    "openpyxl (>=3.1.5,<4.0.0)",
+    "pillow (>=11.2.1,<12.0.0)",
+    "pdf2image (>=1.17.0,<2.0.0)",
+    "pandas (>=2.2.3,<3.0.0)",
+    "xlsxwriter (>=3.2.3,<4.0.0)",
+    "langchain-huggingface (==0.1.2)",
+    "torch (==2.6.0)",
+    "langchain-chroma (==0.2.2)",
+    "pydantic-settings (==2.8.1)",
+    "langchain-text-splitters (==0.3.7)",
+    "langchain-deepseek (==0.1.3)",
+    "langchain-openai (==0.3.11)",
+    "loguru (==0.7.3)",
+    "sentence-transformers (==3.4.1)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

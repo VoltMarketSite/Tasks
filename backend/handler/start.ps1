@@ -1,0 +1,1 @@
+C:/Users/legeo/AppData/Local/pypoetry/Cache/virtualenvs/backend-avSqGmg--py3.13/Scripts/python.exe d:/VoltMarketSite/backend/handler/chat_gpt.py 

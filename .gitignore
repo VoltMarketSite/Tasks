@@ -1,0 +1,6 @@
+backend/handler/__pycache__
+backend/handler/temp/*
+backend/handler/results/*
+backend/handler/DB/tov.xlsx
+backend/handler/DB/base.db
+backend/handler/DB/volt_chroma_db
