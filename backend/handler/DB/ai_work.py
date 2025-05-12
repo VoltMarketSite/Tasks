@@ -173,7 +173,7 @@ def search_products(db, query: str, metadata_filter: dict = None, k: int = 4):
 
 def ai_list2list(db, names):
     return [search_products(db, name, k=6) for name in names]
-
+# test
 
 def build_chroma_db(data: list, collection_name: str = "my_collection", persist_dir: str = "./chroma_db"):
     chroma_client = chromadb.PersistentClient(
