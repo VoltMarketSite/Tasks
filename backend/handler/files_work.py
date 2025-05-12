@@ -1,8 +1,7 @@
-import patoolib, os, shutil, magic
+import patoolib, os, shutil, magic, sqlite3
 import pandas as pd
 from loguru import logger
-from DB.work import names2new_names
-from DB.ai_work import search_products, ai_list2list
+from DB.ai_work import ai_list2list
 
 def is_archive(filepath: str) -> bool:
     """Проверяет, является ли файл архивом любого формата"""
@@ -29,32 +28,41 @@ def pad_dict_list(dict_list, padel):
             dict_list[lname] += [padel] * (lmax - ll)
     return dict_list
 
-def save_response_to_excel(db, path, num, response):
+def save_response_to_excel(db_norm: sqlite3.Cursor, db, path, num, response):
     # Убедиться, что путь существует
     os.makedirs(path, exist_ok=True)
-    
     # Формирование имени файла
     filename = os.path.join(path, f"task_{num}.xlsx")
     response = pad_dict_list(response, '')
+
+    true_names = []
+    for i in response.get("articles", [""]):
+        db_norm.execute(f"SELECT * FROM base_volt WHERE article='{i}'")
+        req = db_norm.fetchone()
+        if req: true_names.append(req)
+        else: true_names.append(())
     # --- Первый лист: Товары ---
     # names, keywords = names2new_names(response.get("names", [""]))
     logger.info(f"Сохранение в файл '{filename}'...")
     ai_data = ai_list2list(db, response.get("names", [""]))
-    ai_names = [i[0]["text"] for i in ai_data]
-    ai_score = [i[0]["similarity_score"] for i in ai_data]
-    ai_manufact = [i[0]["metadata"]["manufactor"] for i in ai_data]
-    ai_article = [i[0]["metadata"]["article"] for i in ai_data]
+    ai_names = [(i_t[1] if i_t else i[0]["text"]) for i_t, i in zip(true_names, ai_data)]
+    ai_score = [(100 if i_t else round(100*(1 - i[0]["similarity_score"]), 2)) for i_t, i in zip(true_names, ai_data)]
+    ai_manufact = [(i_t[3] if i_t else i[0]["metadata"]["manufactor"]) for i_t, i in zip(true_names, ai_data)]
+    ai_article = [(i_t[2] if i_t else i[0]["metadata"]["article"]) for i_t, i in zip(true_names, ai_data)]
+    method = [("SQL" if i_t else "Vector") for i_t, i in zip(true_names, ai_data)]
     products_data = {
-        "Артикул": ai_article,
-        "Наим. из email": response.get("names", [""]),
-        "Наим. из 1С": ai_names,
-        "Similarity": ai_score,
-        # "keyWords": keywords,
-        # "Наим. по 1C": names,
+        "Наим. из запроса": response.get("names", [""]),
+        "Артикул из запроса": response.get("articles", [""]),
         "Кол-во": response.get("counts", [""]),
         "Ед. изм.": response.get("quantityes", [""]),
+        "Примечания": response.get("notes", [""]),
+        "Артикул из обработки": ai_article,
+        "Наим. из обработки": ai_names,
+        "Схожесть %": ai_score,
+        # "keyWords": keywords,
+        # "Наим. по 1C": names,
         "Производитель": ai_manufact,
-        "Примечания": response.get("notes", [""])
+        "Метод": method
     }
     for prod in ai_data:
         for i in range(len(prod)):

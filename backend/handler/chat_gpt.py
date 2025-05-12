@@ -1,4 +1,4 @@
-import requests, base64, json, email, imaplib, email.message, os
+import requests, base64, imaplib, os, sqlite3
 from DB.ai_work import connect_to_chroma
 from env import *
 from loguru import logger
@@ -93,14 +93,17 @@ JSON должен быть в формате
 def main():
 
     current_path = os.path.dirname(os.path.abspath(__file__))
-    mail_pass = EMAILS[1]["pass"]
-    username = EMAILS[1]["email"]
     imap_server = "smtp.volt-market.com"
     imap = imaplib.IMAP4_SSL(imap_server)
-    logger.info("Подключение к почте...")
-    imap.login(username, mail_pass)
 
-    imap.select("INBOX")
+    conn = sqlite3.connect(f"{current_path}\\DB\\base.db")
+    cur = conn.cursor()
+
+    mail_pass = EMAILS[0]["pass"]
+    username = EMAILS[0]["email"]
+    logger.info(f"Подключение к почте {username}...")
+    imap.login(username, mail_pass)
+    imap.select(EMAILS[0]["box"])
     logger.success("Подключение установлено!!!")
     db = connect_to_chroma()
     _, uuids = imap.uid("search", "UNSEEN")
@@ -115,7 +118,7 @@ def main():
             result = ( extract_json(req) )
             logger.success("Данные успешно отформатированы")
             # print(result)
-            save_response_to_excel(db, f"{current_path}\\results", uuid.decode(), result)
+            save_response_to_excel(cur, db, f"{current_path}\\results", uuid.decode(), result)
             # with open(f"temp.json", "w") as f:
             #     json.dump(result, f)
             # print("-"*50)
@@ -130,4 +133,4 @@ start = datetime.now()
 main()
 end = datetime.now()
 print(end - start)
-input("Введите что нибудь для выхода...")
+# input("Введите что нибудь для выхода...")

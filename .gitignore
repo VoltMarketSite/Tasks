@@ -1,4 +1,5 @@
 backend/handler/__pycache__
+backend/handler/DB/__pycache__
 backend/handler/temp/*
 backend/handler/results/*
 backend/handler/DB/tov.xlsx
